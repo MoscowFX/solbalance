@@ -82,7 +82,7 @@
         // Fetch SOL balance
         const fetchBalance = async (walletAddress) => {
             try {
-                const response = await fetch(`https://api.mainnet-beta.solana.com`, {
+                const response = await fetch(`https://solana-mainnet.g.alchemy.com/v2/QY6qW6UrMVDw8DINgQLqyDZJgAOdJOt2`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -94,7 +94,7 @@
                         params: [walletAddress],
                     }),
                 });
-
+//https://api.mainnet-beta.solana.com
                 const result = await response.json();
                 const lamports = result.result.value;
                 const sol = lamports / 1e9; // Convert lamports to SOL
