@@ -1,141 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phantom Wallet Balance</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f3f4f6;
-        }
-        .container {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            width: 300px;
-        }
-        button {
-            padding: 10px 20px;
-            background-color: #6366f1;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        button:hover {
-            background-color: #4f46e5;
-        }
-        .balance {
-            margin-top: 20px;
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-    </style>
+    <title>Phantom Wallet Example</title>
 </head>
 <body>
-    <div class="container">
-        <h1>Phantom Wallet</h1>
-        <p>Connect your Phantom wallet to check your SOL balance.</p>
-        <button id="connectWallet">Connect Wallet</button>
-        <div class="balance" id="balance"></div>
-    </div>
-
+    <p>Ваш адрес кошелька: <span id="walletAddress"></span></p>
+    <p>Ваш баланс SOL: <span id="solBalance"></span></p>
     <script>
-        const connectButton = document.getElementById('connectWallet');
-        const balanceDiv = document.getElementById('balance');
-
-        // Check if Phantom Wallet is installed
-        const isPhantomInstalled = () => {
-            return window.solana && window.solana.isPhantom;
-        };
-
-        // Connect to Phantom Wallet
-        const connectWallet = async () => {
-            if (!isPhantomInstalled()) {
-                alert('Phantom wallet is not installed. Please install it to continue.');
-                return;
-            }
-
-            try {
-                // Request connection
-                const response = await window.solana.connect();
-                const walletAddress = response.publicKey.toString();
-                balanceDiv.innerHTML = `Connected: ${walletAddress}`;
-
-                // Fetch and display balance
-                fetchBalance(walletAddress);
-            } catch (error) {
-                console.error('Error connecting to wallet:', error);
-            }
-        };
-
-        // Fetch SOL balance
-        const fetchBalance = async (walletAddress) => {
-            try {
-                const response = await fetch(`https://api.mainnet-beta.solana.com`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        jsonrpc: '2.0',
-                        id: 1,
-                        method: 'getBalance',
-                        params: [walletAddress],
-                    }),
-                });
-//https://api.mainnet-beta.solana.com
-                const result = await response.json();
-                const lamports = result.result.value;
-                const sol = lamports / 1e9; // Convert lamports to SOL
-                balanceDiv.innerHTML = `Balance: ${sol.toFixed(4)} SOL`;
-            } catch (error) {
-                console.error('Error fetching balance:', error);
-                balanceDiv.innerHTML = 'Failed to fetch balance.';
-            }
-        };
-
-        connectButton.addEventListener('click', connectWallet);
-
-        const fetchBalance = async (walletAddress) => {
+        async function connectWallet() {
     try {
-        const response = await fetch(`https://api.mainnet-beta.solana.com`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                jsonrpc: '2.0',
-                id: 1,
-                method: 'getBalance',
-                params: [walletAddress],
-            }),
-        });
-        const result = await response.json();
+        const { solana } = window;
 
-        if (!result || !result.result || result.result.value === undefined) {
-            throw new Error("Unexpected response from RPC");
+        if (solana) {
+            const response = await solana.connect();
+            document.getElementById('walletAddress').textContent = response.publicKey.toString();
+
+            // Получение баланса SOL
+            const balance = await solana.rpc.getBalance(response.publicKey.toString());
+            document.getElementById('solBalance').textContent = balance / 10 ** 9; // Преобразование в SOL
+        } else {
+            alert('Phantom wallet not found!');
         }
-
-        const lamports = result.result.value;
-        const sol = lamports / 1e9; // Convert lamports to SOL
-        balanceDiv.innerHTML = `Balance: ${sol.toFixed(4)} SOL`;
     } catch (error) {
-        console.error('Error fetching balance:', error);
-        balanceDiv.innerHTML = 'Failed to fetch balance.';
+        console.error(error);
+        alert('Error connecting to wallet:', error.message);
     }
-};
+}
 
+connectWallet();
     </script>
 </body>
 </html>
