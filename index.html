@@ -7,24 +7,18 @@
     <p>Ваш адрес кошелька: <span id="walletAddress"></span></p>
     <p>Ваш баланс SOL: <span id="solBalance"></span></p>
     <script>
-        async function connectWallet() {
+      async function connectWallet() {
+  const connectButton = document.getElementById('connectButton');
+  const walletAddressElement = document.getElementById('walletAddress');
+  const solBalanceElement = document.getElementById('solBalance');
+
+  connectButton.addEventListener('click', async () => {
     try {
-        const { solana } = window;
-
-        if (solana) {
-            const response = await solana.connect();
-            document.getElementById('walletAddress').textContent = response.publicKey.toString();
-
-            // Получение баланса SOL
-            const balance = await solana.rpc.getBalance(response.publicKey.toString());
-            document.getElementById('solBalance').textContent = balance / 10 ** 9; // Преобразование в SOL
-        } else {
-            alert('Phantom wallet not found!');
-        }
+      // ... (остальной код без изменений)
     } catch (error) {
-        console.error(error);
-        alert('Error connecting to wallet:', error.message);
+      alert('Произошла ошибка при подключении к кошельку: ' + error.message);
     }
+  });
 }
 
 connectWallet();
